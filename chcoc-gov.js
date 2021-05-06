@@ -7,10 +7,15 @@ function fetchBlobs() {
     .then(response => response.text())
     .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
     .then(xml => {
-        let blobList = Array.from(xml.querySelectorAll("Blobs"));
+        let blobList = Array.from(xml.getElementsByTagName("Url"));
         console.log(blobList);
         blobList.forEach(async blobUrl => {
             console.log(blobUrl);
+            var bloblink = document.createElement('a');
+            bloblink.innerHTML = blobUrl.textContent;
+            bloblink.href = blobUrl.textContent;
+
+            document.querySelector('#bloblist').append(bloblink);
         });
     });
 }
