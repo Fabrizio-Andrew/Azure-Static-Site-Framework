@@ -6,6 +6,24 @@
         <link rel="stylesheet" href="https://www.opm.gov/support/retirement/css/uswds/styles.css?v=1620677087823977852">
         <link rel="stylesheet" href="https://use.typekit.net/vgn7vpt.css?v=1620677087823977852">
         <link rel="stylesheet" href="https://www.opm.gov/support/retirement/css/fontawesome/all.css?v=1620677087823977852">
+        <style>
+            .usa-nav__primary-item > button:hover {
+                color: #dec69a;
+            }
+            .usa-nav__primary button[aria-expanded=false] {
+                background-image: url(https://www.opm.gov/support/retirement/img/uswds/angle-arrow-down-white.svg);
+            }
+            .usa-nav__primary button[aria-expanded=false]:hover {
+                background-image: url(https://www.opm.gov/support/retirement/img/uswds/angle-arrow-down-white.svg);
+            }
+            .usa-nav__primary button[aria-expanded=true] {
+                background-color: #000;
+                background-image: url(https://www.opm.gov/support/retirement/img/uswds/angle-arrow-up-white.svg);
+            }
+            .usa-nav__submenu {
+                background-color: #000;
+            }
+        </style>
     </head>
     <body>
         <section class="usa-banner" aria-label="Official government website">
@@ -67,10 +85,32 @@
                     <button class="usa-nav__close"> <img src="https://www.opm.gov/support/retirement/img/uswds/close.svg" alt="close"> </button>
                     <ul class="usa-nav__primary usa-accordion">
                         <li class="usa-nav__primary-item">
-                            <a class="usa-nav__link" href="#"><span>About</span></a>
+                            <button class="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="primary-nav-1"><span>About</span></button>
+                            <ul id="primary-nav-1" class="usa-nav__submenu">
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">Council Mission Statement</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">Council Charter</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">Gallery</a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="usa-nav__primary-item">
-                            <a class="usa-nav__link" href="#"><span>Members</span></a>
+                            <button class="usa-accordion__button usa-nav__link" aria-expanded="false" aria-controls="primary-nav-2"><span>Members</span></button>
+                            <ul id="primary-nav-2" class="usa-nav__submenu">
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">CHCOs</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">Deputy CHCOs</a>
+                                </li>
+                                <li class="usa-nav__submenu-item">
+                                    <a href="#">Executive Staff</a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="usa-nav__primary-item">
                             <a class="usa-nav__link" href="#"><span>Meetings</span></a>
