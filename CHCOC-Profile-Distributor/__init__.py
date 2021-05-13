@@ -3,6 +3,8 @@ from io import StringIO
 import csv
 import json
 import azure.functions as func
+from .validation import Validate_Member
+import uuid
 
 
 def main(myblob: func.InputStream):
@@ -28,6 +30,19 @@ def main(myblob: func.InputStream):
         for value in row:
             row_dict[key[i]] = value
             i+=1
-        with open(f"{row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json", 'w') as outfile:
-            json.dump(row_dict, outfile)
-        logging.info(f"File Created: {row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json")
+
+        # Validate the resulting dict
+        errors = Validate_Member(row_dict)
+        if len(errors) > 0:
+            error_id = uuid.uuid1()
+            logging.info(f"Error ID: {error_id}\n"
+                        "Error Creating file. Check failed files container for details.")
+            error_dict = { 'id': error_id, 'errors': errors, 'body': row_dict }
+            # Create file
+            with open(f"{error_id}", "w") as outfile:
+                json.dump(error_dict, outfile)
+        else:
+            with open(f"{row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json", 'w') as outfile:
+                json.dump(row_dict, outfile)
+            logging.info(f"File Created: {row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json")
+
