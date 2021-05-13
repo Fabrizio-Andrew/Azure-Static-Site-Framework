@@ -1,7 +1,7 @@
 import logging
 from io import StringIO
 import csv
-
+import json
 import azure.functions as func
 
 
@@ -10,11 +10,24 @@ def main(myblob: func.InputStream):
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes\n")
 
+    # Extract the csv body from stream
     body = myblob.read().decode("utf-8")
     logging.info(f"raw body: {body}")
 
+    # Parse the body string
     csv_reader = csv.reader(body.split('\n'), delimiter='|')
+
+    # The first row of the csv is a list of table headers
+    key = next(csv_reader)
+
     for row in csv_reader:
-        logging.info(row)
-    parsed_csv = list(csv_reader)
-    logging.info(f"parsed csv: {parsed_csv}")
+        row_dict = {}
+        i=0
+
+        # For however many values in row, append it to the dict with the corresponding key
+        for value in row:
+            row_dict[key[i]] = value
+            i+=1
+        with open(f"{row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json", 'w') as outfile:
+            json.dump(row_dict, outfile)
+        logging.info(f"File Created: {row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json")
