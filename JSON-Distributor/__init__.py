@@ -3,6 +3,7 @@ from io import StringIO
 import csv
 import json
 import azure.functions as func
+from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 from .validation import Validate_Member
 import uuid
 
@@ -11,6 +12,9 @@ def main(myblob: func.InputStream):
     logging.info(f"Python blob trigger function processed blob \n"
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes\n")
+
+    # Create the BlobServiceClient
+    blob_service_client = BlobServiceClient.from_connection_string()
 
     # Extract the csv body from stream
     body = myblob.read().decode("utf-8")
@@ -42,7 +46,10 @@ def main(myblob: func.InputStream):
             with open(f"{error_id}", "w") as outfile:
                 json.dump(error_dict, outfile)
         else:
+            # Create file
             with open(f"{row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json", 'w') as outfile:
                 json.dump(row_dict, outfile)
+
+            
             logging.info(f"File Created: {row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json")
 
