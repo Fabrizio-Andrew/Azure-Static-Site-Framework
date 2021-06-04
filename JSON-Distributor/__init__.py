@@ -34,7 +34,7 @@ def main(myblob: func.InputStream):
 
         # Store a copy of the uploaded original in the archive container
         filename = myblob.name + "_" + str(timestamp)
-        UploadBlob(filename, body, ConfigSettings.ARCHIVE_CONTAINERNAME, blob_service_client)
+        #UploadBlob(filename, body, ConfigSettings.ARCHIVE_CONTAINERNAME, blob_service_client)
         
     except:
         # Catch invalid file formats
@@ -82,6 +82,8 @@ def main(myblob: func.InputStream):
             filename = f"{row_dict['agency_abbrev']}-{row_dict['title']}-{row_dict['first_name']}-{row_dict['last_name']}.json"
             file_body = json.dumps(row_dict, indent = 4)
 
+            #blob_client = blob_service_client.get_blob_client(container=ConfigSettings.JSON_FILES_CONTAINERNAME, blob=filename)
+
             UploadBlob(filename, file_body, ConfigSettings.JSON_FILES_CONTAINERNAME, blob_service_client)
             
             logging.info(f"File Created: {filename}")
@@ -112,7 +114,10 @@ def CreateContainersIfNotExist(connection_string, blob_service_client):
     except Exception as e:
         json_container = blob_service_client.create_container(ConfigSettings.ARCHIVE_CONTAINERNAME)
 
-def UploadBlob(filename, file_body, cont, blob_service_client):
+"""
+Uploads a specified file to a specified azure storage blob container.
+"""
+def UploadBlob(filename, file_body, cont, bsc):
 
     # Write data to the file
     file = open(filename, 'w')
@@ -120,8 +125,8 @@ def UploadBlob(filename, file_body, cont, blob_service_client):
     file.close()
 
     # Create the blob client
-    blob_client = blob_service_client.get_blob_client(container=cont, blob=filename)
+    blob_client = bsc.get_blob_client(container=cont, blob=filename)
 
     # Upload the file
     with open(filename, 'rb') as outfile:
-        blob_client.upload_blob(outfile)
+        blob_client.upload_blob(outfile, overwrite=True)
