@@ -16,8 +16,6 @@ def main(myblob: func.InputStream):
                  f"Name: {myblob.name}\n"
                  f"Blob Size: {myblob.length} bytes\n")
 
-    timestamp = datetime.datetime.now()
-
     # Create the BlobServiceClient
     blob_service_client = BlobServiceClient.from_connection_string(ConfigSettings.STORAGE_CONNECTION_STRING)
 
@@ -28,15 +26,18 @@ def main(myblob: func.InputStream):
     body = myblob.read().decode("utf-8")
     logging.info(f"raw body: {body}")
 
-    try: 
+    if myblob.name.endswith('.csv') and '|' in body: 
         # Parse the body string
         csv_reader = csv.reader(body.split('\n'), delimiter='|')
 
         # Store a copy of the uploaded original in the archive container
-        filename = myblob.name + "_" + str(timestamp)
-        #UploadBlob(filename, body, ConfigSettings.ARCHIVE_CONTAINERNAME, blob_service_client)
+        id = uuid.uuid1()
+        nameindex = myblob.name.find('/') + 1
+        blobname = myblob.name[nameindex:-4]
+        filename = blobname + "_" + str(id)
+        UploadBlob(filename, body, ConfigSettings.ARCHIVE_CONTAINERNAME, blob_service_client)
         
-    except:
+    else:
         # Catch invalid file formats
         error_id = uuid.uuid1()
         logging.info(f"Error ID: {error_id} Uploaded file format is invalid.")
@@ -88,10 +89,11 @@ def main(myblob: func.InputStream):
             
             logging.info(f"File Created: {filename}")
 
-"""
-Creates the JSON, ERROR, and ARCHIVE containers if they do not already exist.
-"""
+
 def CreateContainersIfNotExist(connection_string, blob_service_client):
+    """
+    Creates the JSON, ERROR, and ARCHIVE containers if they do not already exist.
+    """
 
     # Create the JSON container (if it doesn't already exist)
     json_container = ContainerClient.from_connection_string(connection_string, ConfigSettings.JSON_FILES_CONTAINERNAME)
@@ -114,10 +116,11 @@ def CreateContainersIfNotExist(connection_string, blob_service_client):
     except Exception as e:
         json_container = blob_service_client.create_container(ConfigSettings.ARCHIVE_CONTAINERNAME)
 
-"""
-Uploads a specified file to a specified azure storage blob container.
-"""
+
 def UploadBlob(filename, file_body, cont, bsc):
+    """
+    Uploads a specified file to a specified azure storage blob container.
+    """
 
     # Write data to the file
     file = open(filename, 'w')
